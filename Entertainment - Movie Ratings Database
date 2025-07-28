@@ -1,0 +1,97 @@
+#Scenario: Tables include movies, ratings, users
+
+-- DATABASE & TABLE SETUP
+CREATE DATABASE SQL_CASE_STUDY_PRACTICE;
+USE SQL_CASE_STUDY_PRACTICE;
+
+-- Creating movies table with basic attributes
+CREATE TABLE movies (movie_id INT PRIMARY KEY , title VARCHAR(30),genre VARCHAR(30),release_year INT);
+
+-- Creating ratings table with foreign key relationships to movies and users
+CREATE TABLE ratings (rating_id INT , movie_id INT , user_id INT , rating FLOAT , rating_date DATE , 
+FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
+FOREIGN KEY (user_id) REFERENCES users(user_id));
+
+-- Creating users table to store user info
+CREATE TABLE users (user_id INT PRIMARY KEY , name varchar(20) , region varchar (30));
+
+-- DATA INSERTION
+INSERT INTO movies VALUES (1,'The Grand Adventure' ,'Adventure',2024),
+(2,'Love in the Air','Romance',2023),
+(3,'Mystery Mansion','Mystery',2022),
+(4,'Space Odyssey','Sci-Fi',2024),
+(5,'Comedy Nights','Comedy',2021);
+
+INSERT INTO users VALUES (101,'Riya','North America'),
+(102,'Arjun','Asia'),
+(103,'Sophie','Europe'),
+(104,'Carlos','South America');
+
+INSERT INTO ratings VALUES (1,1,101,4.5,'2024-07-01'),
+(2,2,102,3.8,'2023-06-15'),
+(3,3,103,4.2,'2022-05-20'),
+(4,4,101,4.9,'2024-07-10'),
+(5,5,104,3.5,'2021-04-12'),
+(6,1,102,4.0,'2024-07-05'),
+(7,4,103,4.8,'2024-07-12'),
+(8,2,104,3.9,'2023-06-20');
+SELECT*FROM movies;
+SELECT*FROM ratings;
+SELECT*FROM users;
+
+-- 1. Find the average rating for each genre.
+SELECT genre,AVG(rating) AS avg_rating FROM movies 
+JOIN ratings ON movies.movie_id = ratings.movie_id GROUP BY genre;
+
+-- 2. List the top 3 highest-rated movies released in 2024.
+SELECT title,rating FROM movies 
+JOIN ratings ON movies.movie_id = ratings.movie_id 
+WHERE YEAR(rating_date)=2024 ORDER BY rating DESC LIMIT 3;
+
+-- 3. Identify all movies rated by the user with user_id = 101.
+SELECT title,user_id from movies LEFT JOIN ratings on movies.movie_id = ratings.movie_id WHERE user_id=101;
+
+-- 4. Find the total number of ratings given for each movie.
+SELECT title,COUNT(rating) AS total_ratings FROM movies JOIN ratings ON movies.movie_id = ratings.movie_id GROUP BY title;
+
+-- 5. List all users who have rated movies in the Adventure genre.
+SELECT DISTINCT(name) FROM users 
+JOIN ratings ON users.user_id = ratings.user_id 
+JOIN movies ON ratings.movie_id = movies.movie_id;
+
+-- 6. Calculate the average rating for movies released before 2023.
+SELECT ROUND(AVG(rating),2) AS avg_rating FROM ratings WHERE YEAR(rating_date) = 2023;
+
+-- 7. Find the most recent rating date for each movie.
+SELECT title,MAX(rating_date) AS latest_rating_date FROM movies JOIN ratings on movies.movie_id = ratings.movie_id GROUP BY title;
+
+-- 8. List all movies that have an average rating greater than 4.0.
+SELECT title,ROUND(AVG(rating),2) FROM movies JOIN ratings on movies.movie_id = ratings.movie_id 
+GROUP BY title Having AVG(rating)>4 ;
+
+-- 9. Identify the user who gave the highest rating for Space Odyssey.
+SELECT name,rating FROM users JOIN ratings on users.user_id = ratings.user_id 
+join movies on ratings.movie_id = movies.movie_id 
+WHERE title ='Space Odyssey' ORDER BY rating DESC LIMIT 1;
+
+-- 10. Find the total number of users who rated movies in 2024.
+SELECT COUNT(DISTINCT(user_id)) FROM ratings WHERE YEAR(rating_date)=2024;
+
+-- 11. List all movies along with their genres and average ratings.
+SELECT title,genre,ROUND(AVG(rating),2) FROM movies JOIN ratings ON movies.movie_id = ratings.movie_id GROUP BY genre,title;
+
+-- 12. Find the region with the highest number of users who rated movies.
+SELECT region, COUNT(DISTINCT(users.user_id)) AS Num_of_users FROM users 
+JOIN ratings ON users.user_id = ratings.user_id GROUP BY region 
+ORDER BY Num_of_users DESC LIMIT 1;
+
+-- 13. List all movies that have been rated by more than 2 users.
+SELECT title,COUNT(DISTINCT(user_id)) AS num_of_user FROM movies 
+JOIN ratings on movies.movie_id = ratings.rating_id GROUP BY title HAVING num_of_user>2;
+
+-- 14. Identify the movie with the lowest average rating.
+SELECT title, AVG(rating) AS avg_rating FROM movies 
+JOIN ratings ON movies.movie_id = ratings.movie_id  GROUP BY title ORDER BY avg_rating ASC LIMIT 1;
+
+-- 15. Find the total number of ratings given by each user.
+SELECT name,COUNT(rating) AS total_rating FROM users JOIN ratings ON users.user_id = ratings.user_id GROUP BY name;
