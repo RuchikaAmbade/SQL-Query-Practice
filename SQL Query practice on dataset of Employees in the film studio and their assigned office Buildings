@@ -1,0 +1,36 @@
+CREATE TABLE BUILDINGS (BUILDING_NAME VARCHAR(5) PRIMARY KEY, CAPACITY INT);
+
+INSERT INTO BUILDINGS VALUES('1e',24),('1w',32),('2e',16),('2w',20);
+
+CREATE TABLE EMPLOYEES (ROLE VARCHAR (50),NAME VARCHAR(50),BUILDING VARCHAR(5),YEARS_EMAPLOYES INT, FOREIGN KEY (BUILDING) REFERENCES BUILDINGS(BUILDING_NAME));
+
+INSERT INTO EMPLOYEES VALUES ('Engineer','Becky A.','1e',4),
+('Engineer','Dan B.','1e',2),
+('Engineer','Sharon F.','1e',6),
+('Engineer','Dan M.','1e',4),
+('Engineer','Malcom S.','1e',1),
+('Artist','Tylar S.','2w',2),
+('Artist','Sherman D.','2w',8),
+('Artist','Jakob J.','2w',6),
+('Artist','Lillia A.','2w',7),
+('Artist','Brandon J.','2w',7),
+('Manager','Scott K.','1e',9),
+('Manager','Shirlee M.','1e',3),
+('Manager','Daria O.','2w',6);
+
+-- 1.Find the list of all buildings that have employees
+SELECT DISTINCT(BUILDING) FROM EMPLOYEES;
+
+-- 2.Find the list of all buildings and their capacity
+SELECT * FROM BUILDINGS;
+
+-- 3.List all buildings and the distinct employee roles in each building (including empty buildings)
+SELECT DISTINCT BUILDING_NAME,ROLE FROM BUILDINGS LEFT JOIN EMPLOYEES ON BUILDINGS.BUILDING_NAME=EMPLOYEES.BUILDING;
+
+INSERT INTO EMPLOYEES VALUES('Engineer','Yancy I.',Null,0),('Artist','Oliver P.',Null,0);
+
+-- 4.Find the name and role of all employees who have not been assigned to a building
+SELECT NAME,ROLE FROM employees WHERE BUILDING IS NULL;
+
+-- 5.Find the names of the buildings that hold no employees
+SELECT DISTINCT (BUILDING_NAME) FROM BUILDINGS LEFT JOIN EMPLOYEES ON BUILDINGS.BUILDING_NAME = EMPLOYEES.BUILDING WHERE ROLE IS NULL;
